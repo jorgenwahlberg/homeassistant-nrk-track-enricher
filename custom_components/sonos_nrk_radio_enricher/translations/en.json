@@ -1,0 +1,33 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Sonos NRK Radio Enricher",
+        "description": "This integration will automatically discover Sonos media players and enrich NRK radio playback with detailed track information.",
+        "data": {
+          "update_interval": "Update interval (seconds)"
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Only a single instance is allowed."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Sonos NRK Radio Enricher Options",
+        "data": {
+          "update_interval": "Update interval (seconds)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "nrk_enricher": {
+        "name": "NRK Radio"
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebSearch",
+      "WebFetch(domain:developers.home-assistant.io)",
+      "WebFetch(domain:www.hacs.xyz)",
+      "WebFetch(domain:www.home-assistant.io)",
+      "WebFetch(domain:aarongodfrey.dev)",
+      "WebFetch(domain:psapi.nrk.no)"
+    ]
+  }
+}

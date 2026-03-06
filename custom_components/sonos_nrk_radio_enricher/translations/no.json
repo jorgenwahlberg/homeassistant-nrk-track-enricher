@@ -1,0 +1,33 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Sonos NRK Radio-beriker",
+        "description": "Denne integrasjonen vil automatisk oppdage Sonos mediaspillere og berike NRK radio-avspilling med detaljert sporinformasjon.",
+        "data": {
+          "update_interval": "Oppdateringsintervall (sekunder)"
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Kun én instans er tillatt."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Sonos NRK Radio-beriker Innstillinger",
+        "data": {
+          "update_interval": "Oppdateringsintervall (sekunder)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "nrk_enricher": {
+        "name": "NRK Radio"
+      }
+    }
+  }
+}

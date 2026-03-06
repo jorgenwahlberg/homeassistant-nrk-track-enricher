@@ -1,0 +1,13 @@
+{
+  "domain": "sonos_nrk_radio_enricher",
+  "name": "Sonos NRK Radio Enricher",
+  "codeowners": ["@jorgenwahlberg"],
+  "config_flow": true,
+  "dependencies": ["media_player"],
+  "documentation": "https://github.com/jorgenwahlberg/homeassistant-nrk-track-enricher",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/jorgenwahlberg/homeassistant-nrk-track-enricher/issues",
+  "requirements": [],
+  "version": "1.0.0"
+}
