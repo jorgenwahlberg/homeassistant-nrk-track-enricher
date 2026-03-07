@@ -270,7 +270,7 @@ class SonosNRKMonitorSensor(CoordinatorEntity[NRKDataCoordinator], SensorEntity)
                 attributes.update(
                     {
                         ATTR_STATION_NAME: track_info.station_name,
-                        ATTR_STATION_LOGO: self._current_station["logo_url"],
+                        ATTR_STATION_LOGO: track_info.station_logo,
                         ATTR_PROGRAM_TITLE: track_info.program_title,
                         ATTR_TRACK_TITLE: track_info.track_title,
                         ATTR_TRACK_ARTIST: track_info.track_artist,
@@ -283,7 +283,6 @@ class SonosNRKMonitorSensor(CoordinatorEntity[NRKDataCoordinator], SensorEntity)
             else:
                 # NRK detected but no data yet
                 attributes[ATTR_STATION_NAME] = self._current_station["name"]
-                attributes[ATTR_STATION_LOGO] = self._current_station["logo_url"]
         else:
             # Pass through original Sonos attributes
             attributes.update(

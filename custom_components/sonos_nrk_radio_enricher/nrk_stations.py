@@ -12,7 +12,6 @@ class NRKStation(TypedDict):
     livebuffer_url: str
     sonos_uri: str
     stream_delay: int
-    logo_url: str
 
 
 NRK_STATIONS: list[NRKStation] = [
@@ -22,7 +21,6 @@ NRK_STATIONS: list[NRKStation] = [
         "livebuffer_url": "https://psapi.nrk.no/radio/channels/livebuffer/p1",
         "sonos_uri": "x-sonosapi-hls:live%3ap1",
         "stream_delay": 15000,
-        "logo_url": "https://gfx.nrk.no/img/MdWTJg-aV3_NbIEsQ3pLkgb_z_Wh97RCEyLF8PEfpfJQ",
     },
     {
         "name": "NRK P2",
@@ -30,7 +28,6 @@ NRK_STATIONS: list[NRKStation] = [
         "livebuffer_url": "https://psapi.nrk.no/radio/channels/livebuffer/p2",
         "sonos_uri": "x-sonosapi-hls:live%3ap2",
         "stream_delay": 15000,
-        "logo_url": "https://gfx.nrk.no/img/FKQR3YCUvJ4yVKoGp_-O4A_Z0iJHEsV4qr0zMQ8GgqwA",
     },
     {
         "name": "NRK P3",
@@ -38,7 +35,6 @@ NRK_STATIONS: list[NRKStation] = [
         "livebuffer_url": "https://psapi.nrk.no/radio/channels/livebuffer/p3",
         "sonos_uri": "x-sonosapi-hls:live%3ap3",
         "stream_delay": 15000,
-        "logo_url": "https://gfx.nrk.no/img/WoNqKJ_bZU4bE2cGx_0_-wcb4nI-kZ8VGGoGpDEfEoYw",
     },
     {
         "name": "NRK mP3",
@@ -46,7 +42,6 @@ NRK_STATIONS: list[NRKStation] = [
         "livebuffer_url": "https://psapi.nrk.no/radio/channels/livebuffer/mp3",
         "sonos_uri": "x-sonosapi-hls:live%3amp3",
         "stream_delay": 15000,
-        "logo_url": "https://gfx.nrk.no/img/bsIUhD_l0o6dElhAJ8jW2gXYlVJeVp-WTdJXVGGSOpMA",
     },
     {
         "name": "NRK P1+",
@@ -54,7 +49,6 @@ NRK_STATIONS: list[NRKStation] = [
         "livebuffer_url": "https://psapi.nrk.no/radio/channels/livebuffer/p1pluss",
         "sonos_uri": "x-sonosapi-hls:live%3ap1pluss",
         "stream_delay": 15000,
-        "logo_url": "https://gfx.nrk.no/img/qo_rfz-DVhk3qXa3YAiL3APtN0e8fVnQc4IWKS9Lqd1g",
     },
     {
         "name": "NRK P13",
@@ -62,7 +56,6 @@ NRK_STATIONS: list[NRKStation] = [
         "livebuffer_url": "https://psapi.nrk.no/radio/channels/livebuffer/p13",
         "sonos_uri": "x-sonosapi-hls:live%3ap13",
         "stream_delay": 15000,
-        "logo_url": "https://gfx.nrk.no/img/kKZf-nfhkZ0DlU8kcgDpggnR3Qe3MJ_FoOHVlJgL0qhg",
     },
     {
         "name": "NRK Klassisk",
@@ -70,7 +63,6 @@ NRK_STATIONS: list[NRKStation] = [
         "livebuffer_url": "https://psapi.nrk.no/radio/channels/livebuffer/klassisk",
         "sonos_uri": "x-sonosapi-hls:live%3aklassisk",
         "stream_delay": 15000,
-        "logo_url": "https://gfx.nrk.no/img/sUXCPVsxkEIDOcjU5W4v5gNMsChAEcVY9-w-OjAKHwJg",
     },
     {
         "name": "NRK Jazz",
@@ -78,7 +70,6 @@ NRK_STATIONS: list[NRKStation] = [
         "livebuffer_url": "https://psapi.nrk.no/radio/channels/livebuffer/jazz",
         "sonos_uri": "x-sonosapi-hls:live%3ajazz",
         "stream_delay": 15000,
-        "logo_url": "https://gfx.nrk.no/img/O_4BnC91LzMpYlpR4rQo5Al7MPshPLdFINt_1_dFz1Uw",
     },
     {
         "name": "NRK Folkemusikk",
@@ -86,7 +77,6 @@ NRK_STATIONS: list[NRKStation] = [
         "livebuffer_url": "https://psapi.nrk.no/radio/channels/livebuffer/folkemusikk",
         "sonos_uri": "x-sonosapi-hls:live%3afolkemusikk",
         "stream_delay": 15000,
-        "logo_url": "https://gfx.nrk.no/img/lKx5OAmf7EzYZUYBnTgA9QMwk8QdOEuLO_qDwXHmgJyA",
     },
     {
         "name": "NRK Sport",
@@ -94,7 +84,6 @@ NRK_STATIONS: list[NRKStation] = [
         "livebuffer_url": "https://psapi.nrk.no/radio/channels/livebuffer/sport",
         "sonos_uri": "x-sonosapi-hls:live%3asport",
         "stream_delay": 15000,
-        "logo_url": "https://gfx.nrk.no/img/zXgaGF0hgikO8kMzpFRTVgQ_yO3r59_kU_Gx2QsGr4Ew",
     },
     {
         "name": "NRK Nyheter",
@@ -102,7 +91,6 @@ NRK_STATIONS: list[NRKStation] = [
         "livebuffer_url": "https://psapi.nrk.no/radio/channels/livebuffer/nyheter",
         "sonos_uri": "x-sonosapi-hls:live%3anyheter",
         "stream_delay": 15000,
-        "logo_url": "https://gfx.nrk.no/img/y0VdJvA0JFlqQhR19fOMjQnUBkMO7V_AwV0bq5J2H9Rg",
     },
     {
         "name": "NRK Sápmi",
@@ -110,7 +98,6 @@ NRK_STATIONS: list[NRKStation] = [
         "livebuffer_url": "https://psapi.nrk.no/radio/channels/livebuffer/sapmi",
         "sonos_uri": "x-sonosapi-hls:live%3asapmi",
         "stream_delay": 15000,
-        "logo_url": "https://gfx.nrk.no/img/m1_P-8jzlhk-Qet3w1Y5XwoKaVGdFAXwcP9NUEfgVUzg",
     },
 ]
 

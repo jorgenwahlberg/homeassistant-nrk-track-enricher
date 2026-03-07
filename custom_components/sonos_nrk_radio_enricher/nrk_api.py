@@ -26,6 +26,7 @@ class NRKTrackInfo:
         track_artist: str | None = None,
         description: str | None = None,
         image_url: str | None = None,
+        station_logo: str | None = None,
     ) -> None:
         """Initialize track info."""
         self.station_name = station_name
@@ -34,6 +35,7 @@ class NRKTrackInfo:
         self.track_artist = track_artist
         self.description = description
         self.image_url = image_url
+        self.station_logo = station_logo
 
     @property
     def enriched_artist(self) -> str:
@@ -61,6 +63,7 @@ class NRKTrackInfo:
             "track_artist": self.track_artist,
             "description": self.description,
             "image_url": self.image_url,
+            "station_logo": self.station_logo,
             "enriched_artist": self.enriched_artist,
             "enriched_title": self.enriched_title,
         }
@@ -148,6 +151,18 @@ class NRKApiClient:
                 type(data).__name__,
             )
 
+            # Extract channel logo from response
+            station_logo = None
+            if isinstance(data, dict):
+                channel = data.get("channel", {})
+                if isinstance(channel, dict):
+                    # Look for logo in channel.image.url or channel.imageUrl
+                    if "image" in channel and isinstance(channel["image"], dict):
+                        station_logo = channel["image"].get("url")
+                    elif "imageUrl" in channel:
+                        station_logo = channel["imageUrl"]
+                    _LOGGER.debug("Extracted station logo from liveelements: %s", station_logo)
+
             # Handle response - can be a list directly or an object with segments
             if isinstance(data, list):
                 segments = data
@@ -228,7 +243,7 @@ class NRKApiClient:
                     _LOGGER.debug(
                         "Time match! Extracting track info for %s", station["name"]
                     )
-                    return self._extract_track_info_from_segment(station, segment)
+                    return self._extract_track_info_from_segment(station, segment, station_logo)
                 else:
                     _LOGGER.debug(
                         "Time mismatch: current time %s not in range %s to %s",
@@ -276,6 +291,18 @@ class NRKApiClient:
                 type(data).__name__,
             )
 
+            # Extract channel logo from response
+            station_logo = None
+            if isinstance(data, dict):
+                channel = data.get("channel", {})
+                if isinstance(channel, dict):
+                    # Look for logo in channel.image.url or channel.imageUrl
+                    if "image" in channel and isinstance(channel["image"], dict):
+                        station_logo = channel["image"].get("url")
+                    elif "imageUrl" in channel:
+                        station_logo = channel["imageUrl"]
+                    _LOGGER.debug("Extracted station logo from livebuffer: %s", station_logo)
+
             # Handle response - can be a list directly or an object with entries
             if isinstance(data, list):
                 entries = data
@@ -304,7 +331,7 @@ class NRKApiClient:
                     continue
 
                 if actual_start <= current_time <= actual_end:
-                    return self._extract_track_info_from_entry(station, entry)
+                    return self._extract_track_info_from_entry(station, entry, station_logo)
 
             _LOGGER.debug(
                 "No matching entry found in livebuffer for %s", station["name"]
@@ -319,13 +346,14 @@ class NRKApiClient:
             raise
 
     def _extract_track_info_from_segment(
-        self, station: NRKStation, segment: dict
+        self, station: NRKStation, segment: dict, station_logo: str | None = None
     ) -> NRKTrackInfo:
         """Extract track info from a liveelements segment.
 
         Args:
             station: NRK station configuration
             segment: Segment data from API
+            station_logo: Station logo URL from channel data
 
         Returns:
             NRKTrackInfo extracted from segment
@@ -355,16 +383,18 @@ class NRKApiClient:
             track_artist=track_artist,
             description=description,
             image_url=image_url,
+            station_logo=station_logo,
         )
 
     def _extract_track_info_from_entry(
-        self, station: NRKStation, entry: dict
+        self, station: NRKStation, entry: dict, station_logo: str | None = None
     ) -> NRKTrackInfo:
         """Extract track info from a livebuffer entry.
 
         Args:
             station: NRK station configuration
             entry: Entry data from API
+            station_logo: Station logo URL from channel data
 
         Returns:
             NRKTrackInfo extracted from entry
@@ -384,6 +414,7 @@ class NRKApiClient:
             program_title=program_title,
             description=description,
             image_url=image_url,
+            station_logo=station_logo,
         )
 
     @staticmethod
