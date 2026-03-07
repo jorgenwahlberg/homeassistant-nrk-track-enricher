@@ -99,6 +99,13 @@ class NRKApiClient:
             milliseconds=station["stream_delay"]
         )
 
+        _LOGGER.debug(
+            "Fetching track for %s with adjusted time: %s (delay: %dms)",
+            station["name"],
+            adjusted_time,
+            station["stream_delay"],
+        )
+
         # Fetch station logo from livebuffer (it has channel metadata)
         station_logo = await self._fetch_station_logo(station)
 
@@ -255,6 +262,11 @@ class NRKApiClient:
             # Find current segment with relativeTimeType === "Present"
             for segment in segments:
                 relative_type = segment.get("relativeTimeType")
+                _LOGGER.debug(
+                    "Segment '%s' has relativeTimeType: %s",
+                    segment.get("title"),
+                    relative_type,
+                )
                 if relative_type != "Present":
                     continue
 
@@ -417,11 +429,29 @@ class NRKApiClient:
                 actual_start = self._parse_timestamp(entry.get("actualStart"))
                 actual_end = self._parse_timestamp(entry.get("actualEnd"))
 
+                _LOGGER.debug(
+                    "Livebuffer entry '%s': start=%s, end=%s, current=%s",
+                    entry.get("title"),
+                    actual_start,
+                    actual_end,
+                    current_time,
+                )
+
                 if not (actual_start and actual_end):
+                    _LOGGER.debug("Entry missing start or end time, skipping")
                     continue
 
                 if actual_start <= current_time <= actual_end:
+                    _LOGGER.debug(
+                        "Time match! Entry '%s' matches current time",
+                        entry.get("title"),
+                    )
                     return self._extract_track_info_from_entry(station, entry, station_logo)
+                else:
+                    _LOGGER.debug(
+                        "Time mismatch for entry '%s'",
+                        entry.get("title"),
+                    )
 
             _LOGGER.debug(
                 "No matching entry found in livebuffer for %s", station["name"]
