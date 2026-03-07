@@ -348,9 +348,10 @@ class NRKRadioCardEditor extends HTMLElement {
           <label>Layout</label>
           <ha-select
             id="layout-select"
+            value="${this._config.layout || 'square'}"
           >
-            <mwc-list-item value="square" ${this._config.layout === 'square' || !this._config.layout ? 'selected' : ''}>Square</mwc-list-item>
-            <mwc-list-item value="horizontal" ${this._config.layout === 'horizontal' ? 'selected' : ''}>Horizontal</mwc-list-item>
+            <mwc-list-item value="square">Square</mwc-list-item>
+            <mwc-list-item value="horizontal">Horizontal</mwc-list-item>
           </ha-select>
         </div>
       </div>
@@ -394,12 +395,14 @@ class NRKRadioCardEditor extends HTMLElement {
     }
 
     if (layoutSelect) {
+      // Listen for value-changed event like other HA components
+      layoutSelect.addEventListener('value-changed', (ev) => {
+        if (ev.detail.value) {
+          this._valueChanged('layout', ev.detail.value);
+        }
+      });
       layoutSelect.addEventListener('closed', (ev) => {
         ev.stopPropagation();
-        // Get value after dropdown closes
-        if (layoutSelect.value) {
-          this._valueChanged('layout', layoutSelect.value);
-        }
       });
     }
   }
