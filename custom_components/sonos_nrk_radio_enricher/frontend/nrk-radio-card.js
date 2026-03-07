@@ -175,9 +175,171 @@ class NRKRadioCard extends HTMLElement {
       layout: 'square'
     };
   }
+
+  static getConfigElement() {
+    return document.createElement('nrk-radio-card-editor');
+  }
+}
+
+class NRKRadioCardEditor extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  setConfig(config) {
+    this._config = config;
+    this.render();
+  }
+
+  set hass(hass) {
+    this._hass = hass;
+    this._updateEntityPicker();
+  }
+
+  configChanged(newConfig) {
+    const event = new Event('config-changed', {
+      bubbles: true,
+      composed: true,
+    });
+    event.detail = { config: newConfig };
+    this.dispatchEvent(event);
+  }
+
+  render() {
+    if (!this._config) {
+      return;
+    }
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        .card-config {
+          padding: 16px;
+        }
+        .option {
+          margin-bottom: 16px;
+        }
+        .option label {
+          display: block;
+          margin-bottom: 4px;
+          font-weight: 500;
+          color: var(--primary-text-color);
+        }
+        ha-entity-picker,
+        ha-textfield,
+        ha-select {
+          width: 100%;
+        }
+        .switch-option {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 16px;
+        }
+        .switch-option label {
+          margin: 0;
+          font-weight: 500;
+          color: var(--primary-text-color);
+        }
+      </style>
+      <div class="card-config">
+        <div class="option">
+          <label>Entity (required)</label>
+          <ha-entity-picker
+            id="entity-picker"
+            value="${this._config.entity || ''}"
+            include-domains='["sensor"]'
+            allow-custom-entity
+          ></ha-entity-picker>
+        </div>
+
+        <div class="option">
+          <label>Name</label>
+          <ha-textfield
+            id="name-input"
+            value="${this._config.name || 'Now Playing'}"
+            placeholder="Now Playing"
+          ></ha-textfield>
+        </div>
+
+        <div class="switch-option">
+          <label>Show header</label>
+          <ha-switch
+            id="header-switch"
+            ${this._config.show_header !== false ? 'checked' : ''}
+          ></ha-switch>
+        </div>
+
+        <div class="option">
+          <label>Layout</label>
+          <ha-select
+            id="layout-select"
+          >
+            <mwc-list-item value="square" ${this._config.layout === 'square' || !this._config.layout ? 'selected' : ''}>Square</mwc-list-item>
+            <mwc-list-item value="horizontal" ${this._config.layout === 'horizontal' ? 'selected' : ''}>Horizontal</mwc-list-item>
+          </ha-select>
+        </div>
+      </div>
+    `;
+
+    this._attachEventListeners();
+  }
+
+  _updateEntityPicker() {
+    const picker = this.shadowRoot?.getElementById('entity-picker');
+    if (picker && this._hass) {
+      picker.hass = this._hass;
+    }
+  }
+
+  _attachEventListeners() {
+    const entityPicker = this.shadowRoot.getElementById('entity-picker');
+    const nameInput = this.shadowRoot.getElementById('name-input');
+    const headerSwitch = this.shadowRoot.getElementById('header-switch');
+    const layoutSelect = this.shadowRoot.getElementById('layout-select');
+
+    if (entityPicker) {
+      entityPicker.addEventListener('value-changed', (ev) => {
+        this._valueChanged('entity', ev.detail.value);
+      });
+      if (this._hass) {
+        entityPicker.hass = this._hass;
+      }
+    }
+
+    if (nameInput) {
+      nameInput.addEventListener('input', (ev) => {
+        this._valueChanged('name', ev.target.value);
+      });
+    }
+
+    if (headerSwitch) {
+      headerSwitch.addEventListener('change', (ev) => {
+        this._valueChanged('show_header', ev.target.checked);
+      });
+    }
+
+    if (layoutSelect) {
+      layoutSelect.addEventListener('selected', (ev) => {
+        this._valueChanged('layout', ev.target.value);
+      });
+      layoutSelect.addEventListener('closed', (ev) => {
+        ev.stopPropagation();
+      });
+    }
+  }
+
+  _valueChanged(key, value) {
+    if (!this._config) {
+      return;
+    }
+    const newConfig = { ...this._config, [key]: value };
+    this.configChanged(newConfig);
+  }
 }
 
 customElements.define('nrk-radio-card', NRKRadioCard);
+customElements.define('nrk-radio-card-editor', NRKRadioCardEditor);
 
 // Register the card with the card picker
 window.customCards = window.customCards || [];

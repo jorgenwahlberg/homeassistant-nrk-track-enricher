@@ -113,12 +113,25 @@ This integration includes a custom Lovelace card for displaying NRK radio playba
 1. After installing the integration, the card is automatically registered
 2. In Lovelace dashboard, click "Add Card"
 3. Search for "NRK Radio Card"
-4. Select your NRK sensor entity
-5. Configure card options (optional)
+4. Configure using the visual editor:
+   - **Entity**: Select your NRK sensor entity (e.g., `sensor.bedroom_sonos_nrk`)
+   - **Name**: Card header text (default: "Now Playing")
+   - **Show header**: Toggle to show/hide the header
+   - **Layout**: Choose between Square or Horizontal layout
 
 ### Card Configuration
 
-#### Square Layout (Default)
+The card supports both visual editing (recommended) and YAML configuration.
+
+#### Visual Editor
+
+Simply add the card and use the built-in visual editor to configure all options. No YAML editing required!
+
+#### YAML Configuration (Alternative)
+
+You can also configure the card via YAML if preferred.
+
+**Square Layout (Default)**
 ```yaml
 type: custom:nrk-radio-card
 entity: sensor.bedroom_sonos_nrk

@@ -16,7 +16,8 @@
       "Bash(git commit:*)",
       "WebFetch(domain:community.home-assistant.io)",
       "WebFetch(domain:gist.github.com)",
-      "WebFetch(domain:sergiocarracedo.es)"
+      "WebFetch(domain:sergiocarracedo.es)",
+      "Bash(git push:*)"
     ]
   }
 }
