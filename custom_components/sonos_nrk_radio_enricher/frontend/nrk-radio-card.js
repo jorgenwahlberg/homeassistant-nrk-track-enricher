@@ -134,16 +134,6 @@ class NRKRadioCard extends HTMLElement {
           color: var(--disabled-text-color);
           margin-top: 8px;
         }
-        .nrk-badge {
-          display: inline-block;
-          background: #ff4444;
-          color: white;
-          padding: 4px 12px;
-          border-radius: 12px;
-          font-size: 0.75em;
-          font-weight: bold;
-          margin-top: 8px;
-        }
       </style>
       <ha-card>
         ${this.config.show_header !== false && !isHorizontal ? `<div class="card-header">${this.config.name || 'Now Playing'}</div>` : ''}
@@ -162,7 +152,6 @@ class NRKRadioCard extends HTMLElement {
           <div class="title">${displayTitle}</div>
           ${displayArtist ? `<div class="artist">${displayArtist}</div>` : ''}
           ${displayStation ? `<div class="station">${displayStation}</div>` : ''}
-          ${isNrk ? '<div class="nrk-badge">NRK</div>' : ''}
         </div>
       </ha-card>
     `;

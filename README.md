@@ -102,7 +102,6 @@ This integration includes a custom Lovelace card for displaying NRK radio playba
   - Fallback icon when no artwork available
 - Station name and program title
 - Track title and artist
-- Visual NRK badge when playing NRK radio
 - Automatic updates when track changes
 - **Two layout modes:**
   - **Square** (default): Centered artwork with info below
@@ -167,7 +166,6 @@ The card will automatically display:
 - **Station logo** when playing a program without specific track info
 - Track title and artist (when available)
 - Station name and program title
-- A red NRK badge when playing NRK radio
 - Falls back to standard Sonos data when not playing NRK
 
 ## Examples
