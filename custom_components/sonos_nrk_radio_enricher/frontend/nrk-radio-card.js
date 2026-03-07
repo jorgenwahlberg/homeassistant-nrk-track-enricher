@@ -84,32 +84,33 @@ class NRKRadioCard extends HTMLElement {
     this.shadowRoot.innerHTML = `
       <style>
         ha-card {
+          position: relative;
           padding: 16px;
           display: flex;
           flex-direction: ${isHorizontal ? 'row' : 'column'};
           align-items: ${isHorizontal ? 'center' : 'center'};
           gap: ${isHorizontal ? '16px' : '0'};
         }
-        .card-header-container {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          width: 100%;
-          margin-bottom: ${isHorizontal ? '0' : '12px'};
-        }
         .card-header {
           font-size: 1.2em;
           font-weight: bold;
           color: var(--primary-text-color);
-          flex: 1;
+          margin-bottom: ${isHorizontal ? '0' : '12px'};
+          ${isHorizontal ? '' : 'width: 100%;'}
         }
-        ha-icon-button {
+        .control-icon {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          z-index: 1;
+        }
+        .control-icon ha-icon-button {
           --mdc-icon-button-size: 32px;
           --mdc-icon-size: 20px;
           color: var(--secondary-text-color);
           cursor: pointer;
         }
-        ha-icon-button:hover {
+        .control-icon ha-icon-button:hover {
           color: var(--primary-text-color);
         }
         .artwork-container {
@@ -166,14 +167,15 @@ class NRKRadioCard extends HTMLElement {
         }
       </style>
       <ha-card>
-        ${!isHorizontal && (this.config.show_header !== false || sonosEntityId) ? `
-          <div class="card-header-container">
-            ${this.config.show_header !== false ? `<div class="card-header">${this.config.name || 'Now Playing'}</div>` : ''}
-            ${sonosEntityId ? `<ha-icon-button class="control-button">
+        ${sonosEntityId ? `
+          <div class="control-icon">
+            <ha-icon-button class="control-button">
               <ha-icon icon="mdi:cast-audio"></ha-icon>
-            </ha-icon-button>` : ''}
+            </ha-icon-button>
           </div>
         ` : ''}
+
+        ${this.config.show_header !== false && !isHorizontal ? `<div class="card-header">${this.config.name || 'Now Playing'}</div>` : ''}
 
         <div class="artwork-container">
           ${displayImage ?
@@ -185,14 +187,7 @@ class NRKRadioCard extends HTMLElement {
         </div>
 
         <div class="info">
-          ${isHorizontal && (this.config.show_header !== false || sonosEntityId) ? `
-            <div class="card-header-container">
-              ${this.config.show_header !== false ? `<div class="card-header">${this.config.name || 'Now Playing'}</div>` : ''}
-              ${sonosEntityId ? `<ha-icon-button class="control-button">
-                <ha-icon icon="mdi:cast-audio"></ha-icon>
-              </ha-icon-button>` : ''}
-            </div>
-          ` : ''}
+          ${this.config.show_header !== false && isHorizontal ? `<div class="card-header">${this.config.name || 'Now Playing'}</div>` : ''}
           <div class="title">${displayTitle}</div>
           ${displayTrackTitle ? `<div class="track-title">${displayTrackTitle}</div>` : ''}
           ${displayTrackArtist ? `<div class="track-artist">${displayTrackArtist}</div>` : ''}
