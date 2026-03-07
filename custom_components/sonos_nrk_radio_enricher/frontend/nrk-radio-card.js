@@ -13,8 +13,23 @@ class NRKRadioCard extends HTMLElement {
   }
 
   set hass(hass) {
+    const oldHass = this._hass;
     this._hass = hass;
-    this.render();
+
+    // Only re-render if the entity state has actually changed
+    if (this.config && this.config.entity) {
+      const oldState = oldHass?.states[this.config.entity];
+      const newState = hass.states[this.config.entity];
+
+      // Check if state or attributes changed
+      if (!oldState ||
+          oldState.state !== newState?.state ||
+          JSON.stringify(oldState.attributes) !== JSON.stringify(newState?.attributes)) {
+        this.render();
+      }
+    } else {
+      this.render();
+    }
   }
 
   render() {
