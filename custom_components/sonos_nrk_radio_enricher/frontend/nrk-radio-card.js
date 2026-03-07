@@ -110,7 +110,7 @@ class NRKRadioCard extends HTMLElement {
           font-size: 1.2em;
           font-weight: bold;
           color: var(--primary-text-color);
-          margin-bottom: ${isHorizontal ? '0' : '12px'};
+          margin-bottom: ${isHorizontal ? '0' : '8px'};
           ${isHorizontal ? '' : 'width: 100%;'}
         }
         .control-icon {
@@ -132,26 +132,26 @@ class NRKRadioCard extends HTMLElement {
           ${isHorizontal ? 'flex-shrink: 0;' : ''}
         }
         .artwork {
-          width: ${isHorizontal ? '120px' : '200px'};
-          height: ${isHorizontal ? '120px' : '200px'};
+          width: ${isHorizontal ? '72px' : '120px'};
+          height: ${isHorizontal ? '72px' : '120px'};
           border-radius: 8px;
           object-fit: cover;
-          margin-bottom: ${isHorizontal ? '0' : '16px'};
+          margin-bottom: ${isHorizontal ? '0' : '8px'};
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
         .artwork-placeholder {
-          width: ${isHorizontal ? '120px' : '200px'};
-          height: ${isHorizontal ? '120px' : '200px'};
+          width: ${isHorizontal ? '72px' : '120px'};
+          height: ${isHorizontal ? '72px' : '120px'};
           border-radius: 8px;
           background: var(--disabled-color);
           display: flex;
           align-items: center;
           justify-content: center;
-          margin-bottom: ${isHorizontal ? '0' : '16px'};
+          margin-bottom: ${isHorizontal ? '0' : '8px'};
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
         .artwork-placeholder ha-icon {
-          --mdc-icon-size: ${isHorizontal ? '60px' : '80px'};
+          --mdc-icon-size: ${isHorizontal ? '36px' : '48px'};
           color: var(--primary-background-color);
         }
         .info {
@@ -160,25 +160,29 @@ class NRKRadioCard extends HTMLElement {
           ${isHorizontal ? 'flex-grow: 1; display: flex; flex-direction: column; justify-content: center;' : ''}
         }
         .title {
-          font-size: ${isHorizontal ? '1.0em' : '1.1em'};
+          font-size: ${isHorizontal ? '0.95em' : '1.0em'};
           font-weight: 500;
-          margin-bottom: 8px;
+          margin-bottom: 4px;
           color: var(--primary-text-color);
+          line-height: 1.3;
         }
         .track-title {
-          font-size: ${isHorizontal ? '0.9em' : '0.95em'};
-          color: var(--secondary-text-color);
-          margin-bottom: 4px;
-        }
-        .track-artist {
           font-size: ${isHorizontal ? '0.85em' : '0.9em'};
           color: var(--secondary-text-color);
-          margin-bottom: 4px;
+          margin-bottom: 2px;
+          line-height: 1.3;
+        }
+        .track-artist {
+          font-size: ${isHorizontal ? '0.8em' : '0.85em'};
+          color: var(--secondary-text-color);
+          margin-bottom: 2px;
+          line-height: 1.3;
         }
         .artist {
-          font-size: ${isHorizontal ? '0.9em' : '0.95em'};
+          font-size: ${isHorizontal ? '0.85em' : '0.9em'};
           color: var(--secondary-text-color);
-          margin-bottom: 4px;
+          margin-bottom: 2px;
+          line-height: 1.3;
         }
       </style>
       <ha-card>
