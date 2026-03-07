@@ -37,10 +37,11 @@ def test_station() -> NRKStation:
 
 
 # Sample API response data based on actual API structure
+# Note: Artist information is in the description field for music tracks
 SAMPLE_LIVEELEMENTS_RESPONSE = [
     {
         "title": "Track Title 1",
-        "description": "Track description",
+        "description": "Artist Name",  # Artist info is in description
         "programId": "program123",
         "channelId": "p1",
         "startTime": "2026-03-07T10:00:00+01:00",
@@ -50,12 +51,12 @@ SAMPLE_LIVEELEMENTS_RESPONSE = [
         "programTitle": "Morning Show",
         "relativeTimeType": "Past",
         "category": "Music",
-        "contributors": ["Artist Name", "Featured Artist"],
+        "contributors": [],
         "creators": [],
     },
     {
         "title": "Current Track Title",
-        "description": "Current track description",
+        "description": "Current Artist",  # Artist info is in description
         "programId": "program124",
         "channelId": "p1",
         "startTime": "2026-03-07T10:03:00+01:00",
@@ -65,12 +66,12 @@ SAMPLE_LIVEELEMENTS_RESPONSE = [
         "programTitle": "Morning Show",
         "relativeTimeType": "Present",
         "category": "Music",
-        "contributors": ["Current Artist"],
+        "contributors": [],
         "creators": [],
     },
     {
         "title": "Future Track",
-        "description": "Future description",
+        "description": "Future Artist",  # Artist info is in description
         "programId": "program125",
         "channelId": "p1",
         "startTime": "2026-03-07T10:07:00+01:00",
@@ -80,7 +81,7 @@ SAMPLE_LIVEELEMENTS_RESPONSE = [
         "programTitle": "Morning Show",
         "relativeTimeType": "Future",
         "category": "Music",
-        "contributors": ["Future Artist"],
+        "contributors": [],
         "creators": [],
     },
 ]
@@ -199,14 +200,14 @@ class TestNRKApiClient:
         result = nrk_api_client._parse_timestamp(None)
         assert result is None
 
-    def test_extract_track_info_from_segment_with_contributors(self, nrk_api_client, test_station):
-        """Test extracting track info from segment with contributors."""
+    def test_extract_track_info_from_segment_with_artist_in_description(self, nrk_api_client, test_station):
+        """Test extracting track info from segment - artist comes from description."""
         segment = {
             "title": "Track Title",
             "programTitle": "Morning Show",
-            "description": "Description",
+            "description": "Artist Name",
             "imageUrl": "https://example.com/image.jpg",
-            "contributors": ["Artist One", "Artist Two"],
+            "contributors": ["Contributor"],
             "creators": [],
         }
 
@@ -215,36 +216,21 @@ class TestNRKApiClient:
         assert info.station_name == "NRK P1"
         assert info.program_title == "Morning Show"
         assert info.track_title == "Track Title"
-        assert info.track_artist == "Artist One, Artist Two"
-        assert info.description == "Description"
+        assert info.track_artist == "Artist Name"  # From description
+        assert info.description == "Artist Name"
         assert info.image_url == "https://example.com/image.jpg"
 
-    def test_extract_track_info_from_segment_with_creators(self, nrk_api_client, test_station):
-        """Test extracting track info from segment with creators fallback."""
+    def test_extract_track_info_from_segment_without_description(self, nrk_api_client, test_station):
+        """Test extracting track info when description is missing."""
         segment = {
             "title": "Track Title",
             "programTitle": "Morning Show",
-            "description": "Description",
             "imageUrl": "https://example.com/image.jpg",
-            "contributors": [],
-            "creators": ["Creator One"],
         }
 
         info = nrk_api_client._extract_track_info_from_segment(test_station, segment)
 
-        assert info.track_artist == "Creator One"
-
-    def test_extract_track_info_from_segment_string_contributor(self, nrk_api_client, test_station):
-        """Test extracting track info when contributor is a string."""
-        segment = {
-            "title": "Track Title",
-            "programTitle": "Morning Show",
-            "contributors": "Single Artist",
-        }
-
-        info = nrk_api_client._extract_track_info_from_segment(test_station, segment)
-
-        assert info.track_artist == "Single Artist"
+        assert info.track_artist is None  # No description means no artist
 
     def test_extract_track_info_from_entry(self, nrk_api_client, test_station):
         """Test extracting track info from livebuffer entry."""

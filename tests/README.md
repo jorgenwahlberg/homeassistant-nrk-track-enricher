@@ -109,14 +109,16 @@ Tests use sample data matching the actual NRK API response structure:
 ```json
 {
   "title": "Track Title",
+  "description": "Artist Name",
   "programTitle": "Program Name",
   "startTime": "2026-03-07T10:00:00+01:00",
   "duration": 180000,
   "relativeTimeType": "Present",
-  "contributors": ["Artist Name"],
   "imageUrl": "https://example.com/image.jpg"
 }
 ```
+
+**Note:** Artist information is stored in the `description` field for music tracks.
 
 This ensures tests accurately reflect real-world API behavior.
 

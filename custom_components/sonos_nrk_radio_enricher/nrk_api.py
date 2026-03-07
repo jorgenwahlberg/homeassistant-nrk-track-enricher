@@ -338,25 +338,11 @@ class NRKApiClient:
         # Image URL - API provides it directly as imageUrl
         image_url = segment.get("imageUrl")
 
-        # Track artist - can be in contributors or creators arrays
-        track_artist = None
-        if contributors := segment.get("contributors"):
-            if isinstance(contributors, list) and contributors:
-                # Join multiple contributors
-                track_artist = ", ".join(contributors)
-            elif isinstance(contributors, str):
-                track_artist = contributors
-
-        # Fallback to creators if no contributors
-        if not track_artist:
-            if creators := segment.get("creators"):
-                if isinstance(creators, list) and creators:
-                    track_artist = ", ".join(creators)
-                elif isinstance(creators, str):
-                    track_artist = creators
+        # Artist information is in the description field for music tracks
+        track_artist = description
 
         _LOGGER.debug(
-            "Extracted info: program=%s, title=%s, artist=%s",
+            "Extracted info: program=%s, title=%s, artist=%s (from description)",
             program_title,
             track_title,
             track_artist,
