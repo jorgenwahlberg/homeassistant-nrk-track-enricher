@@ -300,9 +300,23 @@ class NRKRadioCardEditor extends HTMLElement {
           color: var(--primary-text-color);
         }
         ha-entity-picker,
-        ha-textfield,
-        ha-select {
+        ha-textfield {
           width: 100%;
+        }
+        select.layout-select {
+          width: 100%;
+          padding: 8px;
+          border-radius: 4px;
+          border: 1px solid var(--divider-color);
+          background-color: var(--card-background-color);
+          color: var(--primary-text-color);
+          font-size: 14px;
+          font-family: inherit;
+          cursor: pointer;
+        }
+        select.layout-select:focus {
+          outline: 2px solid var(--primary-color);
+          outline-offset: 1px;
         }
         .switch-option {
           display: flex;
@@ -346,13 +360,13 @@ class NRKRadioCardEditor extends HTMLElement {
 
         <div class="option">
           <label>Layout</label>
-          <ha-select
+          <select
             id="layout-select"
-            value="${this._config.layout || 'square'}"
+            class="layout-select"
           >
-            <mwc-list-item value="square">Square</mwc-list-item>
-            <mwc-list-item value="horizontal">Horizontal</mwc-list-item>
-          </ha-select>
+            <option value="square" ${this._config.layout === 'square' || !this._config.layout ? 'selected' : ''}>Square</option>
+            <option value="horizontal" ${this._config.layout === 'horizontal' ? 'selected' : ''}>Horizontal</option>
+          </select>
         </div>
       </div>
     `;
@@ -372,8 +386,6 @@ class NRKRadioCardEditor extends HTMLElement {
     const nameInput = this.shadowRoot.getElementById('name-input');
     const headerSwitch = this.shadowRoot.getElementById('header-switch');
     const layoutSelect = this.shadowRoot.getElementById('layout-select');
-
-    console.debug('NRK Card Editor: Attaching listeners, layoutSelect found:', !!layoutSelect);
 
     if (entityPicker) {
       entityPicker.addEventListener('value-changed', (ev) => {
@@ -397,19 +409,8 @@ class NRKRadioCardEditor extends HTMLElement {
     }
 
     if (layoutSelect) {
-      console.debug('NRK Card Editor: Setting up layoutSelect listeners');
-
-      // Try multiple event types to see which one fires
-      ['selected', 'click', 'change', 'value-changed', 'opened', 'closed'].forEach(eventName => {
-        layoutSelect.addEventListener(eventName, (ev) => {
-          console.debug('NRK Card Editor: layoutSelect event:', eventName, ev);
-          if (eventName === 'selected' && ev.detail?.index !== undefined) {
-            const index = ev.detail.index;
-            const value = index === 0 ? 'square' : 'horizontal';
-            console.debug('NRK Card Editor: Changing layout to:', value);
-            this._valueChanged('layout', value);
-          }
-        });
+      layoutSelect.addEventListener('change', (ev) => {
+        this._valueChanged('layout', ev.target.value);
       });
     }
   }
@@ -418,7 +419,6 @@ class NRKRadioCardEditor extends HTMLElement {
     if (!this._config) {
       return;
     }
-    console.debug('NRK Card Editor: Config change:', key, '=', value);
     const newConfig = { ...this._config, [key]: value };
     this.configChanged(newConfig);
   }
