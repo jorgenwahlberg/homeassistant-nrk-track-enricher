@@ -267,10 +267,13 @@ class SonosNRKMonitorSensor(CoordinatorEntity[NRKDataCoordinator], SensorEntity)
             # Add enriched NRK data
             track_info = self.coordinator.get_track_info(self._current_station)
             if track_info:
+                # Use Sonos entity_picture as station logo (NRK API images are backgrounds, not logos)
+                station_logo = sonos_state.attributes.get("entity_picture")
+
                 attributes.update(
                     {
                         ATTR_STATION_NAME: track_info.station_name,
-                        ATTR_STATION_LOGO: track_info.station_logo,
+                        ATTR_STATION_LOGO: station_logo,
                         ATTR_PROGRAM_TITLE: track_info.program_title,
                         ATTR_TRACK_TITLE: track_info.track_title,
                         ATTR_TRACK_ARTIST: track_info.track_artist,
@@ -283,6 +286,7 @@ class SonosNRKMonitorSensor(CoordinatorEntity[NRKDataCoordinator], SensorEntity)
             else:
                 # NRK detected but no data yet
                 attributes[ATTR_STATION_NAME] = self._current_station["name"]
+                attributes[ATTR_STATION_LOGO] = sonos_state.attributes.get("entity_picture")
         else:
             # Pass through original Sonos attributes
             attributes.update(
