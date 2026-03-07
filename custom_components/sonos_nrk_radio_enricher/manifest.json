@@ -4,6 +4,7 @@
   "codeowners": ["@jorgenwahlberg"],
   "config_flow": true,
   "dependencies": ["sonos"],
+  "after_dependencies": ["frontend", "http"],
   "documentation": "https://github.com/jorgenwahlberg/homeassistant-nrk-track-enricher",
   "integration_type": "service",
   "iot_class": "cloud_polling",

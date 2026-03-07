@@ -2,6 +2,10 @@
 
 DOMAIN = "sonos_nrk_radio_enricher"
 NAME = "Sonos NRK Radio Enricher"
+VERSION = "1.0.0"
+
+# Frontend
+CARD_TYPE = "nrk-radio-card"
 
 # Configuration
 CONF_UPDATE_INTERVAL = "update_interval"

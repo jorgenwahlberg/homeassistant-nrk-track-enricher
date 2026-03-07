@@ -9,6 +9,7 @@ from homeassistant.core import HomeAssistant
 
 from .const import CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL, DOMAIN
 from .coordinator import NRKDataCoordinator
+from .frontend import async_setup_frontend
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -43,6 +44,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Perform initial refresh
     _LOGGER.debug("Performing initial coordinator refresh")
     await coordinator.async_config_entry_first_refresh()
+
+    # Register the frontend card
+    _LOGGER.debug("Registering custom Lovelace card")
+    await async_setup_frontend(hass)
 
     # Set up platforms
     _LOGGER.debug("Setting up platforms: %s", PLATFORMS)

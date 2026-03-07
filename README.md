@@ -89,6 +89,56 @@ When not playing NRK:
 - `media_album_name`: Original Sonos album
 - `is_nrk_radio`: false
 
+## Custom Dashboard Card
+
+This integration includes a custom Lovelace card for displaying NRK radio playback information with artwork.
+
+### Card Features
+
+- Album artwork display with fallback icon
+- Station name and program title
+- Track title and artist
+- Visual NRK badge when playing NRK radio
+- Automatic updates when track changes
+- Responsive design for mobile and desktop
+
+### Adding the Card
+
+1. After installing the integration, the card is automatically registered
+2. In Lovelace dashboard, click "Add Card"
+3. Search for "NRK Radio Card"
+4. Select your NRK sensor entity
+5. Configure card options (optional)
+
+### Card Configuration
+
+```yaml
+type: custom:nrk-radio-card
+entity: sensor.bedroom_sonos_nrk
+name: Now Playing
+show_header: true
+```
+
+**Configuration Options:**
+- `entity` (required): The NRK sensor entity ID
+- `name` (optional): Card header text (default: "Now Playing")
+- `show_header` (optional): Show/hide header (default: true)
+
+### Card Example
+
+```yaml
+type: custom:nrk-radio-card
+entity: sensor.living_room_sonos_nrk
+name: Living Room Radio
+```
+
+The card will automatically display:
+- Album artwork when available
+- Track title and artist
+- Station name and program title
+- A red NRK badge when playing NRK radio
+- Falls back to standard Sonos data when not playing NRK
+
 ## Examples
 
 ### Display enriched track in Lovelace
