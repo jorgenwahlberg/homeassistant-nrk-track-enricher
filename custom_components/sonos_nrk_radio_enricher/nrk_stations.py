@@ -52,9 +52,9 @@ NRK_STATIONS: list[NRKStation] = [
     },
     {
         "name": "NRK P13",
-        "api_url": "https://psapi.nrk.no/channels/p13/liveelements",
-        "livebuffer_url": "https://psapi.nrk.no/radio/channels/livebuffer/p13",
-        "sonos_uri": "x-sonosapi-hls:live%3ap13",
+        "api_url": "https://psapi.nrk.no/channels/p3musikk/liveelements",
+        "livebuffer_url": "https://psapi.nrk.no/radio/channels/livebuffer/p3musikk",
+        "sonos_uri": "x-sonosapi-hls:live%3ap3musikk",
         "stream_delay": 15000,
     },
     {
@@ -113,7 +113,7 @@ def get_station_by_uri(sonos_uri: str) -> NRKStation | None:
 
     """
     for station in NRK_STATIONS:
-        if sonos_uri.startswith(station["sonos_uri"]):
+        if sonos_uri.startswith(station["sonos_uri"] + "?"):
             return station
     return None
 

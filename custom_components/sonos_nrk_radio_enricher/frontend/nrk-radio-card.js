@@ -58,18 +58,17 @@ class NRKRadioCard extends HTMLElement {
         ? stationLogo  // Program only: show station logo
         : (stateObj.attributes.entity_picture || '');  // Non-NRK: Sonos artwork
 
-    // Fallback to Sonos data if not NRK
+    // For NRK: Show station and program on first line
+    // For non-NRK: Show media_title as before
     const displayTitle = isNrk
-      ? (hasTrack ? enrichedTitle : programTitle || stationName)
+      ? `${stationName}${programTitle ? ' – ' + programTitle : ''}`
       : (stateObj.attributes.media_title || stateObj.state);
 
-    const displayArtist = isNrk
-      ? (hasTrack ? enrichedArtist : '')
-      : (stateObj.attributes.media_artist || '');
-
-    const displayStation = isNrk && hasTrack
-      ? `${stationName}${programTitle ? ' – ' + programTitle : ''}`
-      : '';
+    // For NRK: Show track title and artist on separate lines (only if they exist)
+    // For non-NRK: Keep artist as second line
+    const displayTrackTitle = isNrk && trackTitle ? trackTitle : '';
+    const displayTrackArtist = isNrk && trackArtist ? trackArtist : '';
+    const displayArtist = !isNrk ? (stateObj.attributes.media_artist || '') : '';
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -124,15 +123,20 @@ class NRKRadioCard extends HTMLElement {
           margin-bottom: 8px;
           color: var(--primary-text-color);
         }
-        .artist {
+        .track-title {
           font-size: ${isHorizontal ? '0.9em' : '0.95em'};
           color: var(--secondary-text-color);
           margin-bottom: 4px;
         }
-        .station {
-          font-size: ${isHorizontal ? '0.8em' : '0.85em'};
-          color: var(--disabled-text-color);
-          margin-top: 8px;
+        .track-artist {
+          font-size: ${isHorizontal ? '0.85em' : '0.9em'};
+          color: var(--secondary-text-color);
+          margin-bottom: 4px;
+        }
+        .artist {
+          font-size: ${isHorizontal ? '0.9em' : '0.95em'};
+          color: var(--secondary-text-color);
+          margin-bottom: 4px;
         }
       </style>
       <ha-card>
@@ -150,8 +154,9 @@ class NRKRadioCard extends HTMLElement {
         <div class="info">
           ${this.config.show_header !== false && isHorizontal ? `<div class="card-header">${this.config.name || 'Now Playing'}</div>` : ''}
           <div class="title">${displayTitle}</div>
+          ${displayTrackTitle ? `<div class="track-title">${displayTrackTitle}</div>` : ''}
+          ${displayTrackArtist ? `<div class="track-artist">${displayTrackArtist}</div>` : ''}
           ${displayArtist ? `<div class="artist">${displayArtist}</div>` : ''}
-          ${displayStation ? `<div class="station">${displayStation}</div>` : ''}
         </div>
       </ha-card>
     `;
