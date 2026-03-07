@@ -395,11 +395,11 @@ class NRKRadioCardEditor extends HTMLElement {
     }
 
     if (layoutSelect) {
-      // Listen for value-changed event like other HA components
-      layoutSelect.addEventListener('value-changed', (ev) => {
-        if (ev.detail.value) {
-          this._valueChanged('layout', ev.detail.value);
-        }
+      // ha-select fires 'selected' event when item is clicked
+      layoutSelect.addEventListener('selected', (ev) => {
+        const index = ev.detail.index;
+        const value = index === 0 ? 'square' : 'horizontal';
+        this._valueChanged('layout', value);
       });
       layoutSelect.addEventListener('closed', (ev) => {
         ev.stopPropagation();
@@ -411,6 +411,7 @@ class NRKRadioCardEditor extends HTMLElement {
     if (!this._config) {
       return;
     }
+    console.debug('NRK Card Editor: Config change:', key, '=', value);
     const newConfig = { ...this._config, [key]: value };
     this.configChanged(newConfig);
   }
