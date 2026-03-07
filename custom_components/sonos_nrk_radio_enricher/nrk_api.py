@@ -114,6 +114,11 @@ class NRKApiClient:
             track_info = await self._fetch_from_liveelements(station, adjusted_time, station_logo)
             if track_info:
                 return track_info
+            else:
+                _LOGGER.debug(
+                    "Liveelements returned no matching segment for %s, trying livebuffer",
+                    station["name"],
+                )
         except Exception as err:
             _LOGGER.debug(
                 "Primary API (liveelements) failed for %s: %s",
@@ -121,11 +126,15 @@ class NRKApiClient:
                 err,
             )
 
-        # Fall back to livebuffer API
+        # Fall back to livebuffer API (content may be here even if not in liveelements)
+        _LOGGER.debug("Trying livebuffer fallback for %s", station["name"])
         try:
             track_info = await self._fetch_from_livebuffer(station, adjusted_time, station_logo)
             if track_info:
+                _LOGGER.debug("Successfully got track info from livebuffer for %s", station["name"])
                 return track_info
+            else:
+                _LOGGER.debug("Livebuffer also returned no matching entry for %s", station["name"])
         except Exception as err:
             _LOGGER.warning(
                 "Fallback API (livebuffer) failed for %s: %s",
