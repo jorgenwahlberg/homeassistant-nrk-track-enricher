@@ -131,6 +131,32 @@ This integration:
 - Falls back to secondary API if primary fails
 - Only polls APIs when NRK radio is actively playing
 
+## Development & Testing
+
+### Running Tests
+
+The integration includes comprehensive tests to verify correct API parsing:
+
+```bash
+# Install test dependencies
+pip install -r requirements-test.txt
+
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=custom_components.sonos_nrk_radio_enricher --cov-report=html
+```
+
+See [tests/README.md](tests/README.md) for detailed testing documentation.
+
+### Test Coverage
+
+- **API parsing:** Validates NRK API response handling
+- **Station matching:** Verifies URI pattern matching
+- **Time windows:** Tests segment time range calculations
+- **Data extraction:** Confirms field parsing (contributors, images, etc.)
+
 ## Troubleshooting
 
 Enable debug logging in `configuration.yaml`:

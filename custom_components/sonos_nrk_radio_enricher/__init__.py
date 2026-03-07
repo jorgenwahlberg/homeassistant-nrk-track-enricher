@@ -26,21 +26,26 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         True if setup was successful
 
     """
+    _LOGGER.info("Starting Sonos NRK Radio Enricher integration setup")
     hass.data.setdefault(DOMAIN, {})
 
     # Get configuration
     update_interval = entry.options.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL)
+    _LOGGER.debug("Update interval: %s seconds", update_interval)
 
     # Create coordinator
     coordinator = NRKDataCoordinator(hass, update_interval)
+    _LOGGER.debug("Coordinator created")
 
     # Store coordinator
     hass.data[DOMAIN][entry.entry_id] = coordinator
 
     # Perform initial refresh
+    _LOGGER.debug("Performing initial coordinator refresh")
     await coordinator.async_config_entry_first_refresh()
 
     # Set up platforms
+    _LOGGER.debug("Setting up platforms: %s", PLATFORMS)
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     # Register update listener for options changes

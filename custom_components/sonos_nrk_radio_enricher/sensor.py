@@ -8,6 +8,7 @@ from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_IDLE
 from homeassistant.core import Event, EventStateChangedData, HomeAssistant, callback
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -43,17 +44,34 @@ async def async_setup_entry(
         async_add_entities: Callback to add entities
 
     """
+    _LOGGER.info("Setting up Sonos NRK Radio Enricher sensors")
     coordinator: NRKDataCoordinator = hass.data[DOMAIN][entry.entry_id]
 
-    # Discover all Sonos media_player entities
+    # Use entity registry to find Sonos entities (more reliable than states)
+    entity_registry = er.async_get(hass)
     sonos_entities = []
-    for state in hass.states.async_all("media_player"):
-        # Check if it's a Sonos entity
-        # The Sonos integration creates entities with specific attributes
-        if _is_sonos_entity(state.entity_id, state.attributes):
-            sonos_entities.append(state.entity_id)
 
-    _LOGGER.info("Discovered %d Sonos media player entities", len(sonos_entities))
+    # Find all entities from the Sonos integration
+    for entity_entry in entity_registry.entities.values():
+        if (
+            entity_entry.platform == "sonos"
+            and entity_entry.domain == "media_player"
+        ):
+            sonos_entities.append(entity_entry.entity_id)
+            _LOGGER.debug("Found Sonos entity: %s", entity_entry.entity_id)
+
+    # Fallback: also check states for Sonos entities not in registry
+    all_media_players = hass.states.async_all("media_player")
+    _LOGGER.debug("Found %d total media_player entities in states", len(all_media_players))
+
+    for state in all_media_players:
+        if state.entity_id not in sonos_entities and _is_sonos_entity(
+            state.entity_id, state.attributes
+        ):
+            sonos_entities.append(state.entity_id)
+            _LOGGER.debug("Found Sonos entity via states: %s", state.entity_id)
+
+    _LOGGER.info("Discovered %d Sonos media player entities: %s", len(sonos_entities), sonos_entities)
 
     # Create a monitor sensor for each Sonos entity
     sensors = [
@@ -61,7 +79,9 @@ async def async_setup_entry(
         for entity_id in sonos_entities
     ]
 
+    _LOGGER.debug("Creating %d sensor entities", len(sensors))
     async_add_entities(sensors)
+    _LOGGER.info("Sensor setup complete")
 
 
 def _is_sonos_entity(entity_id: str, attributes: dict[str, Any]) -> bool:
@@ -75,20 +95,26 @@ def _is_sonos_entity(entity_id: str, attributes: dict[str, Any]) -> bool:
         True if entity is a Sonos player
 
     """
-    # Check for Sonos-specific attributes
-    # The Sonos integration typically includes these markers
-    if "source_list" in attributes:
-        # Additional validation: check device info or manufacturer
-        if device_info := attributes.get("device_info"):
-            manufacturer = device_info.get("manufacturer", "").lower()
-            if "sonos" in manufacturer:
-                return True
-
-    # Fallback: check entity_id pattern (less reliable)
-    # Some Sonos integrations use specific naming
+    # Check entity_id pattern (most reliable for Sonos)
     if "sonos" in entity_id.lower():
-        _LOGGER.debug("Potential Sonos entity detected by name: %s", entity_id)
+        _LOGGER.debug("Sonos entity detected by name: %s", entity_id)
         return True
+
+    # Check for Sonos in friendly_name
+    friendly_name = attributes.get("friendly_name", "").lower()
+    if "sonos" in friendly_name:
+        _LOGGER.debug("Sonos entity detected by friendly_name: %s", entity_id)
+        return True
+
+    # Check integration via entity registry attributes
+    # The entity_id might have the integration domain encoded
+    if entity_id.startswith("media_player."):
+        # Log for debugging what we're seeing
+        _LOGGER.debug(
+            "Checking media_player: %s, has source_list: %s",
+            entity_id,
+            "source_list" in attributes,
+        )
 
     return False
 
