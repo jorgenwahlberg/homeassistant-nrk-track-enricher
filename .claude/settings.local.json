@@ -10,7 +10,13 @@
       "WebFetch(domain:aarongodfrey.dev)",
       "WebFetch(domain:psapi.nrk.no)",
       "Bash(python3 -m pytest:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(ls:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "WebFetch(domain:community.home-assistant.io)",
+      "WebFetch(domain:gist.github.com)",
+      "WebFetch(domain:sergiocarracedo.es)"
     ]
   }
 }

@@ -85,6 +85,7 @@ class NRKApiClient:
         """Get current track information for a station.
 
         Tries primary API (liveelements) first, falls back to livebuffer API.
+        Always fetches station logo from livebuffer API.
 
         Args:
             station: NRK station configuration
@@ -98,9 +99,12 @@ class NRKApiClient:
             milliseconds=station["stream_delay"]
         )
 
+        # Fetch station logo from livebuffer (it has channel metadata)
+        station_logo = await self._fetch_station_logo(station)
+
         # Try primary API first
         try:
-            track_info = await self._fetch_from_liveelements(station, adjusted_time)
+            track_info = await self._fetch_from_liveelements(station, adjusted_time, station_logo)
             if track_info:
                 return track_info
         except Exception as err:
@@ -112,7 +116,7 @@ class NRKApiClient:
 
         # Fall back to livebuffer API
         try:
-            track_info = await self._fetch_from_livebuffer(station, adjusted_time)
+            track_info = await self._fetch_from_livebuffer(station, adjusted_time, station_logo)
             if track_info:
                 return track_info
         except Exception as err:
@@ -124,8 +128,53 @@ class NRKApiClient:
 
         return None
 
+    async def _fetch_station_logo(self, station: NRKStation) -> str | None:
+        """Fetch station logo from livebuffer API.
+
+        Args:
+            station: NRK station configuration
+
+        Returns:
+            Station logo URL if found, None otherwise
+
+        """
+        try:
+            async with asyncio.timeout(NRK_API_TIMEOUT):
+                async with self._session.get(
+                    station["livebuffer_url"]
+                ) as response:
+                    response.raise_for_status()
+                    data = await response.json()
+
+            if isinstance(data, dict):
+                channel = data.get("channel", {})
+                _LOGGER.debug("Channel data for logo: %s", channel)
+                if isinstance(channel, dict):
+                    # Extract logo from channel.image.images array
+                    if "image" in channel and isinstance(channel["image"], dict):
+                        images_array = channel["image"].get("images", [])
+                        if images_array and isinstance(images_array, list):
+                            # Pick a good size - prefer 600x337 or first available
+                            for img in images_array:
+                                if isinstance(img, dict) and img.get("width") == 600:
+                                    logo_url = img.get("url")
+                                    _LOGGER.debug("Found station logo (600px): %s", logo_url)
+                                    return logo_url
+                            # Fallback to first image
+                            first_img = images_array[0]
+                            if isinstance(first_img, dict):
+                                logo_url = first_img.get("url")
+                                _LOGGER.debug("Found station logo (first): %s", logo_url)
+                                return logo_url
+
+            _LOGGER.debug("No station logo found in livebuffer response")
+            return None
+        except Exception as err:
+            _LOGGER.debug("Failed to fetch station logo: %s", err)
+            return None
+
     async def _fetch_from_liveelements(
-        self, station: NRKStation, current_time: datetime
+        self, station: NRKStation, current_time: datetime, station_logo: str | None = None
     ) -> NRKTrackInfo | None:
         """Fetch track info from liveelements API.
 
@@ -134,6 +183,7 @@ class NRKApiClient:
         Args:
             station: NRK station configuration
             current_time: Current time adjusted for stream delay
+            station_logo: Station logo URL (from livebuffer)
 
         Returns:
             NRKTrackInfo if successful, None otherwise
@@ -155,12 +205,32 @@ class NRKApiClient:
             station_logo = None
             if isinstance(data, dict):
                 channel = data.get("channel", {})
+                _LOGGER.debug("Channel data from liveelements: %s", channel)
                 if isinstance(channel, dict):
-                    # Look for logo in channel.image.url or channel.imageUrl
-                    if "image" in channel and isinstance(channel["image"], dict):
-                        station_logo = channel["image"].get("url")
+                    # Look for logo in various possible locations
+                    if "image" in channel:
+                        if isinstance(channel["image"], dict):
+                            station_logo = channel["image"].get("url")
+                        elif isinstance(channel["image"], str):
+                            # Image is a string - could be URL or image ID
+                            img = channel["image"]
+                            if img.startswith("http"):
+                                station_logo = img
+                            else:
+                                # Assume it's an image ID, construct URL
+                                station_logo = f"https://gfx.nrk.no/img/{img}"
                     elif "imageUrl" in channel:
                         station_logo = channel["imageUrl"]
+                    elif "squareImage" in channel:
+                        if isinstance(channel["squareImage"], dict):
+                            station_logo = channel["squareImage"].get("url")
+                        elif isinstance(channel["squareImage"], str):
+                            img = channel["squareImage"]
+                            if img.startswith("http"):
+                                station_logo = img
+                            else:
+                                station_logo = f"https://gfx.nrk.no/img/{img}"
+
                     _LOGGER.debug("Extracted station logo from liveelements: %s", station_logo)
 
             # Handle response - can be a list directly or an object with segments
@@ -295,12 +365,32 @@ class NRKApiClient:
             station_logo = None
             if isinstance(data, dict):
                 channel = data.get("channel", {})
+                _LOGGER.debug("Channel data from livebuffer: %s", channel)
                 if isinstance(channel, dict):
-                    # Look for logo in channel.image.url or channel.imageUrl
-                    if "image" in channel and isinstance(channel["image"], dict):
-                        station_logo = channel["image"].get("url")
+                    # Look for logo in various possible locations
+                    if "image" in channel:
+                        if isinstance(channel["image"], dict):
+                            station_logo = channel["image"].get("url")
+                        elif isinstance(channel["image"], str):
+                            # Image is a string - could be URL or image ID
+                            img = channel["image"]
+                            if img.startswith("http"):
+                                station_logo = img
+                            else:
+                                # Assume it's an image ID, construct URL
+                                station_logo = f"https://gfx.nrk.no/img/{img}"
                     elif "imageUrl" in channel:
                         station_logo = channel["imageUrl"]
+                    elif "squareImage" in channel:
+                        if isinstance(channel["squareImage"], dict):
+                            station_logo = channel["squareImage"].get("url")
+                        elif isinstance(channel["squareImage"], str):
+                            img = channel["squareImage"]
+                            if img.startswith("http"):
+                                station_logo = img
+                            else:
+                                station_logo = f"https://gfx.nrk.no/img/{img}"
+
                     _LOGGER.debug("Extracted station logo from livebuffer: %s", station_logo)
 
             # Handle response - can be a list directly or an object with entries
