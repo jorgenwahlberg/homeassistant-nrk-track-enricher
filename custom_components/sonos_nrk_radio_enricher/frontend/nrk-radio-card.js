@@ -48,6 +48,13 @@ class NRKRadioCard extends HTMLElement {
     const imageUrl = stateObj.attributes.image_url || '';
     const sonosEntityId = stateObj.attributes.sonos_entity_id || '';
 
+    // Debug: Log if sonos_entity_id is present
+    if (sonosEntityId) {
+      console.debug('NRK Card: Found Sonos entity ID:', sonosEntityId);
+    } else {
+      console.debug('NRK Card: No Sonos entity ID found in attributes:', stateObj.attributes);
+    }
+
     // Determine layout mode
     const layout = this.config.layout || 'square'; // 'square' or 'horizontal'
     const isHorizontal = layout === 'horizontal';
@@ -159,9 +166,9 @@ class NRKRadioCard extends HTMLElement {
         }
       </style>
       <ha-card>
-        ${this.config.show_header !== false && !isHorizontal ? `
+        ${!isHorizontal && (this.config.show_header !== false || sonosEntityId) ? `
           <div class="card-header-container">
-            <div class="card-header">${this.config.name || 'Now Playing'}</div>
+            ${this.config.show_header !== false ? `<div class="card-header">${this.config.name || 'Now Playing'}</div>` : ''}
             ${sonosEntityId ? `<ha-icon-button class="control-button">
               <ha-icon icon="mdi:cast-audio"></ha-icon>
             </ha-icon-button>` : ''}
@@ -178,9 +185,9 @@ class NRKRadioCard extends HTMLElement {
         </div>
 
         <div class="info">
-          ${this.config.show_header !== false && isHorizontal ? `
+          ${isHorizontal && (this.config.show_header !== false || sonosEntityId) ? `
             <div class="card-header-container">
-              <div class="card-header">${this.config.name || 'Now Playing'}</div>
+              ${this.config.show_header !== false ? `<div class="card-header">${this.config.name || 'Now Playing'}</div>` : ''}
               ${sonosEntityId ? `<ha-icon-button class="control-button">
                 <ha-icon icon="mdi:cast-audio"></ha-icon>
               </ha-icon-button>` : ''}
