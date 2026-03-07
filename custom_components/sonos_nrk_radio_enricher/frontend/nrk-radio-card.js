@@ -25,6 +25,9 @@ class NRKRadioCard extends HTMLElement {
     const entityId = this.config.entity;
     const stateObj = this._hass.states[entityId];
 
+    // Store state reference for click handler access
+    this._stateObj = stateObj;
+
     if (!stateObj) {
       this.shadowRoot.innerHTML = `
         <ha-card>
@@ -43,6 +46,7 @@ class NRKRadioCard extends HTMLElement {
     const enrichedTitle = stateObj.attributes.enriched_title || stateObj.state;
     const enrichedArtist = stateObj.attributes.enriched_artist || '';
     const imageUrl = stateObj.attributes.image_url || '';
+    const sonosEntityId = stateObj.attributes.sonos_entity_id || '';
 
     // Determine layout mode
     const layout = this.config.layout || 'square'; // 'square' or 'horizontal'
@@ -79,12 +83,27 @@ class NRKRadioCard extends HTMLElement {
           align-items: ${isHorizontal ? 'center' : 'center'};
           gap: ${isHorizontal ? '16px' : '0'};
         }
+        .card-header-container {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+          margin-bottom: ${isHorizontal ? '0' : '12px'};
+        }
         .card-header {
           font-size: 1.2em;
           font-weight: bold;
-          margin-bottom: ${isHorizontal ? '0' : '12px'};
           color: var(--primary-text-color);
-          ${isHorizontal ? 'width: 100%; text-align: left;' : ''}
+          flex: 1;
+        }
+        ha-icon-button {
+          --mdc-icon-button-size: 32px;
+          --mdc-icon-size: 20px;
+          color: var(--secondary-text-color);
+          cursor: pointer;
+        }
+        ha-icon-button:hover {
+          color: var(--primary-text-color);
         }
         .artwork-container {
           ${isHorizontal ? 'flex-shrink: 0;' : ''}
@@ -140,7 +159,14 @@ class NRKRadioCard extends HTMLElement {
         }
       </style>
       <ha-card>
-        ${this.config.show_header !== false && !isHorizontal ? `<div class="card-header">${this.config.name || 'Now Playing'}</div>` : ''}
+        ${this.config.show_header !== false && !isHorizontal ? `
+          <div class="card-header-container">
+            <div class="card-header">${this.config.name || 'Now Playing'}</div>
+            ${sonosEntityId ? `<ha-icon-button class="control-button">
+              <ha-icon icon="mdi:cast-audio"></ha-icon>
+            </ha-icon-button>` : ''}
+          </div>
+        ` : ''}
 
         <div class="artwork-container">
           ${displayImage ?
@@ -152,7 +178,14 @@ class NRKRadioCard extends HTMLElement {
         </div>
 
         <div class="info">
-          ${this.config.show_header !== false && isHorizontal ? `<div class="card-header">${this.config.name || 'Now Playing'}</div>` : ''}
+          ${this.config.show_header !== false && isHorizontal ? `
+            <div class="card-header-container">
+              <div class="card-header">${this.config.name || 'Now Playing'}</div>
+              ${sonosEntityId ? `<ha-icon-button class="control-button">
+                <ha-icon icon="mdi:cast-audio"></ha-icon>
+              </ha-icon-button>` : ''}
+            </div>
+          ` : ''}
           <div class="title">${displayTitle}</div>
           ${displayTrackTitle ? `<div class="track-title">${displayTrackTitle}</div>` : ''}
           ${displayTrackArtist ? `<div class="track-artist">${displayTrackArtist}</div>` : ''}
@@ -160,6 +193,30 @@ class NRKRadioCard extends HTMLElement {
         </div>
       </ha-card>
     `;
+
+    // Attach click handler to control button(s) if they exist
+    const controlButtons = this.shadowRoot.querySelectorAll('.control-button');
+    controlButtons.forEach(button => {
+      button.addEventListener('click', (e) => this._handleControlClick(e));
+    });
+  }
+
+  _handleControlClick(e) {
+    e.stopPropagation(); // Prevent card click events
+
+    const sonosEntityId = this._stateObj?.attributes?.sonos_entity_id;
+    if (!sonosEntityId) {
+      console.warn('No Sonos entity ID found');
+      return;
+    }
+
+    // Fire the standard HA more-info event
+    const event = new Event('hass-more-info', {
+      bubbles: true,
+      composed: true,
+    });
+    event.detail = { entityId: sonosEntityId };
+    this.dispatchEvent(event);
   }
 
   getCardSize() {

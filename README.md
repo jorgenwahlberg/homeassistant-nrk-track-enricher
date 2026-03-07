@@ -107,6 +107,21 @@ This integration includes a custom Lovelace card for displaying NRK radio playba
   - **Square** (default): Centered artwork with info below
   - **Horizontal**: Compact panoramic view with artwork on left, perfect for narrow dashboard spaces
 - Responsive design for mobile and desktop
+- **Integrated Sonos controls:** Click the icon in the top-right corner to access full Sonos media player controls
+
+### Card Controls
+
+The NRK Radio Card includes a control button in the top-right corner that opens the standard Home Assistant media player dialog for the connected Sonos device. This provides access to all Sonos features:
+
+- Volume control and mute
+- Play/pause and track navigation
+- Source selection (radio stations, playlists, etc.)
+- Speaker grouping
+- Equalizer and audio settings
+
+Simply click the speaker icon in the top-right corner to open the Sonos controls.
+
+**Note**: The control icon automatically appears when the card is connected to a Sonos device. It will be hidden if the sensor is not associated with a Sonos player.
 
 ### Adding the Card
 
