@@ -414,11 +414,13 @@ class NRKApiClient:
 
                     _LOGGER.debug("Extracted station logo from livebuffer: %s", station_logo)
 
-            # Handle response - can be a list directly or an object with entries
+            # Handle response - entries are nested inside channel object
             if isinstance(data, list):
                 entries = data
             elif isinstance(data, dict):
-                entries = data.get("entries", [])
+                # Livebuffer API structure: {"channel": {"entries": [...]}}
+                channel_data = data.get("channel", {})
+                entries = channel_data.get("entries", [])
             else:
                 _LOGGER.warning(
                     "Unexpected livebuffer response type for %s: %s",
