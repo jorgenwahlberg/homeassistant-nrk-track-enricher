@@ -378,7 +378,12 @@ class NRKRadioCardEditor extends HTMLElement {
 
     if (layoutSelect) {
       layoutSelect.addEventListener('selected', (ev) => {
-        this._valueChanged('layout', ev.target.value);
+        // Get the selected item's value from the detail
+        const selectedIndex = ev.detail.index;
+        const items = layoutSelect.querySelectorAll('mwc-list-item');
+        if (items[selectedIndex]) {
+          this._valueChanged('layout', items[selectedIndex].value);
+        }
       });
       layoutSelect.addEventListener('closed', (ev) => {
         ev.stopPropagation();
