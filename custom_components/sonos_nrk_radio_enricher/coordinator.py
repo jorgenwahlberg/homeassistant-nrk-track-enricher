@@ -74,7 +74,14 @@ class NRKDataCoordinator(DataUpdateCoordinator[dict[str, NRKTrackInfo]]):
 
         """
         if not self._active_stations:
+            _LOGGER.debug("No active stations registered, skipping API calls")
             return {}
+
+        _LOGGER.debug(
+            "Fetching data for %d active station(s): %s",
+            len(self._active_stations),
+            [s["name"] for s in self._active_stations.values()],
+        )
 
         results: dict[str, NRKTrackInfo] = {}
 

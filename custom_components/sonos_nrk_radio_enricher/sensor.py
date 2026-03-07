@@ -6,7 +6,7 @@ from typing import Any
 
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import STATE_IDLE
+from homeassistant.const import STATE_IDLE, STATE_PLAYING
 from homeassistant.core import Event, EventStateChangedData, HomeAssistant, callback
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -191,11 +191,15 @@ class SonosNRKMonitorSensor(CoordinatorEntity[NRKDataCoordinator], SensorEntity)
         if not sonos_state:
             return
 
+        # Check if player is actually playing (not paused, idle, or stopped)
+        player_state = sonos_state.state
+        is_playing = player_state == STATE_PLAYING
+
         # Get media_content_id (the URI being played)
         media_content_id = sonos_state.attributes.get("media_content_id", "")
 
         # Check if NRK radio is playing
-        if is_nrk_radio(media_content_id):
+        if is_nrk_radio(media_content_id) and is_playing:
             station = get_station_by_uri(media_content_id)
             if station:
                 self._is_nrk_radio = True
@@ -206,11 +210,22 @@ class SonosNRKMonitorSensor(CoordinatorEntity[NRKDataCoordinator], SensorEntity)
                         self.coordinator.unregister_station(self._current_station)
                     self.coordinator.register_station(station)
                     self._current_station = station
+                    _LOGGER.debug(
+                        "Player %s is playing NRK, registered station: %s",
+                        self._sonos_entity_id,
+                        station["name"],
+                    )
                     # Trigger immediate coordinator refresh
                     await self.coordinator.async_request_refresh()
         else:
-            # Not playing NRK
+            # Not playing NRK or player is not active
             if self._current_station:
+                _LOGGER.debug(
+                    "Player %s stopped or not playing NRK (state: %s, is_nrk: %s), unregistering station",
+                    self._sonos_entity_id,
+                    player_state,
+                    is_nrk_radio(media_content_id),
+                )
                 self.coordinator.unregister_station(self._current_station)
                 self._current_station = None
             self._is_nrk_radio = False
