@@ -377,16 +377,12 @@ class NRKRadioCardEditor extends HTMLElement {
     }
 
     if (layoutSelect) {
-      layoutSelect.addEventListener('selected', (ev) => {
-        // Get the selected item's value from the detail
-        const selectedIndex = ev.detail.index;
-        const items = layoutSelect.querySelectorAll('mwc-list-item');
-        if (items[selectedIndex]) {
-          this._valueChanged('layout', items[selectedIndex].value);
-        }
-      });
       layoutSelect.addEventListener('closed', (ev) => {
         ev.stopPropagation();
+        // Get value after dropdown closes
+        if (layoutSelect.value) {
+          this._valueChanged('layout', layoutSelect.value);
+        }
       });
     }
   }
