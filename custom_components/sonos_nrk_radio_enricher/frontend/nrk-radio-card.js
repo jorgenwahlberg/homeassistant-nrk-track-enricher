@@ -373,6 +373,8 @@ class NRKRadioCardEditor extends HTMLElement {
     const headerSwitch = this.shadowRoot.getElementById('header-switch');
     const layoutSelect = this.shadowRoot.getElementById('layout-select');
 
+    console.debug('NRK Card Editor: Attaching listeners, layoutSelect found:', !!layoutSelect);
+
     if (entityPicker) {
       entityPicker.addEventListener('value-changed', (ev) => {
         this._valueChanged('entity', ev.detail.value);
@@ -395,14 +397,19 @@ class NRKRadioCardEditor extends HTMLElement {
     }
 
     if (layoutSelect) {
-      // ha-select fires 'selected' event when item is clicked
-      layoutSelect.addEventListener('selected', (ev) => {
-        const index = ev.detail.index;
-        const value = index === 0 ? 'square' : 'horizontal';
-        this._valueChanged('layout', value);
-      });
-      layoutSelect.addEventListener('closed', (ev) => {
-        ev.stopPropagation();
+      console.debug('NRK Card Editor: Setting up layoutSelect listeners');
+
+      // Try multiple event types to see which one fires
+      ['selected', 'click', 'change', 'value-changed', 'opened', 'closed'].forEach(eventName => {
+        layoutSelect.addEventListener(eventName, (ev) => {
+          console.debug('NRK Card Editor: layoutSelect event:', eventName, ev);
+          if (eventName === 'selected' && ev.detail?.index !== undefined) {
+            const index = ev.detail.index;
+            const value = index === 0 ? 'square' : 'horizontal';
+            console.debug('NRK Card Editor: Changing layout to:', value);
+            this._valueChanged('layout', value);
+          }
+        });
       });
     }
   }
