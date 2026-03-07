@@ -217,9 +217,8 @@ class NRKApiClient:
                 type(data).__name__,
             )
 
-            # Extract channel logo from response
-            station_logo = None
-            if isinstance(data, dict):
+            # Extract channel logo from response if not already provided
+            if not station_logo and isinstance(data, dict):
                 channel = data.get("channel", {})
                 _LOGGER.debug("Channel data from liveelements: %s", channel)
                 if isinstance(channel, dict):
