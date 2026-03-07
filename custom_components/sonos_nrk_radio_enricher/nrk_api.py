@@ -335,13 +335,14 @@ class NRKApiClient:
             raise
 
     async def _fetch_from_livebuffer(
-        self, station: NRKStation, current_time: datetime
+        self, station: NRKStation, current_time: datetime, station_logo: str | None = None
     ) -> NRKTrackInfo | None:
         """Fetch track info from livebuffer API (fallback).
 
         Args:
             station: NRK station configuration
             current_time: Current time adjusted for stream delay
+            station_logo: Station logo URL (from previous fetch, optional)
 
         Returns:
             NRKTrackInfo if successful, None otherwise
@@ -361,9 +362,8 @@ class NRKApiClient:
                 type(data).__name__,
             )
 
-            # Extract channel logo from response
-            station_logo = None
-            if isinstance(data, dict):
+            # Extract channel logo from response if not already provided
+            if not station_logo and isinstance(data, dict):
                 channel = data.get("channel", {})
                 _LOGGER.debug("Channel data from livebuffer: %s", channel)
                 if isinstance(channel, dict):
