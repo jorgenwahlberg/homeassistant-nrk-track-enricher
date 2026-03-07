@@ -17,7 +17,8 @@
       "WebFetch(domain:community.home-assistant.io)",
       "WebFetch(domain:gist.github.com)",
       "WebFetch(domain:sergiocarracedo.es)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(loop\"\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
     ]
   }
 }

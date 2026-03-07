@@ -21,29 +21,20 @@ class NRKCardJSView(HomeAssistantView):
     url = f"/{DOMAIN}/nrk-radio-card.js"
     name = f"{DOMAIN}:card-js"
 
-    def __init__(self, js_path: Path) -> None:
-        """Initialize the view."""
-        self.js_path = js_path
+    def __init__(self, js_content: str) -> None:
+        """Initialize the view with cached file content."""
+        self._js_content = js_content
 
     async def get(self, request):
         """Serve the JavaScript file."""
-        _LOGGER.debug("Serving NRK Radio Card JS from %s", self.js_path)
+        _LOGGER.debug("Serving NRK Radio Card JS")
 
-        if not self.js_path.exists():
-            _LOGGER.error("Card JS file not found at %s", self.js_path)
-            return web.Response(status=404, text="Card file not found")
-
-        try:
-            content = self.js_path.read_text(encoding="utf-8")
-            return web.Response(
-                text=content,
-                content_type="application/javascript",
-                charset="utf-8",
-                headers={"Cache-Control": "no-cache"}
-            )
-        except Exception as err:
-            _LOGGER.error("Error reading card JS file: %s", err)
-            return web.Response(status=500, text="Error reading card file")
+        return web.Response(
+            text=self._js_content,
+            content_type="application/javascript",
+            charset="utf-8",
+            headers={"Cache-Control": "no-cache"}
+        )
 
 
 async def async_setup_frontend(hass: HomeAssistant) -> None:
@@ -58,8 +49,22 @@ async def async_setup_frontend(hass: HomeAssistant) -> None:
     _LOGGER.debug("Card JS file path: %s", js_path)
     _LOGGER.debug("Card JS file exists: %s", js_path.exists())
 
+    # Read the JavaScript file content once during setup (non-blocking)
+    if not js_path.exists():
+        _LOGGER.error("Card JS file not found at %s", js_path)
+        return
+
+    try:
+        # Read file content in executor to avoid blocking
+        js_content = await hass.async_add_executor_job(
+            js_path.read_text, "utf-8"
+        )
+    except Exception as err:
+        _LOGGER.error("Error reading card JS file: %s", err)
+        return
+
     # Register a view to serve the JavaScript file
-    view = NRKCardJSView(js_path)
+    view = NRKCardJSView(js_content)
     hass.http.register_view(view)
 
     _LOGGER.debug("Registered card view at %s", view.url)
