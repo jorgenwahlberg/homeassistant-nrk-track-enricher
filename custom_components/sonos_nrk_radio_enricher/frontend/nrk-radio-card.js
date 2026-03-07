@@ -36,6 +36,7 @@ class NRKRadioCard extends HTMLElement {
 
     const isNrk = stateObj.attributes.is_nrk_radio || false;
     const stationName = stateObj.attributes.station_name || '';
+    const stationLogo = stateObj.attributes.station_logo || '';
     const programTitle = stateObj.attributes.program_title || '';
     const trackTitle = stateObj.attributes.track_title || '';
     const trackArtist = stateObj.attributes.track_artist || '';
@@ -43,65 +44,93 @@ class NRKRadioCard extends HTMLElement {
     const enrichedArtist = stateObj.attributes.enriched_artist || '';
     const imageUrl = stateObj.attributes.image_url || '';
 
+    // Determine layout mode
+    const layout = this.config.layout || 'square'; // 'square' or 'horizontal'
+    const isHorizontal = layout === 'horizontal';
+
+    // Determine what to show
+    // If playing a track (has track_title), show artwork
+    // If just program (no track_title), show station logo
+    const hasTrack = isNrk && trackTitle;
+    const displayImage = hasTrack
+      ? (imageUrl || stationLogo)  // Track: prefer artwork, fallback to logo
+      : isNrk
+        ? stationLogo  // Program only: show station logo
+        : (stateObj.attributes.entity_picture || '');  // Non-NRK: Sonos artwork
+
     // Fallback to Sonos data if not NRK
-    const displayTitle = isNrk ? enrichedTitle : (stateObj.attributes.media_title || stateObj.state);
-    const displayArtist = isNrk ? enrichedArtist : (stateObj.attributes.media_artist || '');
-    const displayImage = isNrk ? imageUrl : (stateObj.attributes.entity_picture || '');
+    const displayTitle = isNrk
+      ? (hasTrack ? enrichedTitle : programTitle || stationName)
+      : (stateObj.attributes.media_title || stateObj.state);
+
+    const displayArtist = isNrk
+      ? (hasTrack ? enrichedArtist : '')
+      : (stateObj.attributes.media_artist || '');
+
+    const displayStation = isNrk && hasTrack
+      ? `${stationName}${programTitle ? ' – ' + programTitle : ''}`
+      : '';
 
     this.shadowRoot.innerHTML = `
       <style>
         ha-card {
           padding: 16px;
           display: flex;
-          flex-direction: column;
-          align-items: center;
+          flex-direction: ${isHorizontal ? 'row' : 'column'};
+          align-items: ${isHorizontal ? 'center' : 'center'};
+          gap: ${isHorizontal ? '16px' : '0'};
         }
         .card-header {
           font-size: 1.2em;
           font-weight: bold;
-          margin-bottom: 12px;
+          margin-bottom: ${isHorizontal ? '0' : '12px'};
           color: var(--primary-text-color);
+          ${isHorizontal ? 'width: 100%; text-align: left;' : ''}
+        }
+        .artwork-container {
+          ${isHorizontal ? 'flex-shrink: 0;' : ''}
         }
         .artwork {
-          width: 200px;
-          height: 200px;
+          width: ${isHorizontal ? '120px' : '200px'};
+          height: ${isHorizontal ? '120px' : '200px'};
           border-radius: 8px;
           object-fit: cover;
-          margin-bottom: 16px;
+          margin-bottom: ${isHorizontal ? '0' : '16px'};
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
         .artwork-placeholder {
-          width: 200px;
-          height: 200px;
+          width: ${isHorizontal ? '120px' : '200px'};
+          height: ${isHorizontal ? '120px' : '200px'};
           border-radius: 8px;
           background: var(--disabled-color);
           display: flex;
           align-items: center;
           justify-content: center;
-          margin-bottom: 16px;
+          margin-bottom: ${isHorizontal ? '0' : '16px'};
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
         .artwork-placeholder ha-icon {
-          --mdc-icon-size: 80px;
+          --mdc-icon-size: ${isHorizontal ? '60px' : '80px'};
           color: var(--primary-background-color);
         }
         .info {
-          text-align: center;
+          text-align: ${isHorizontal ? 'left' : 'center'};
           width: 100%;
+          ${isHorizontal ? 'flex-grow: 1; display: flex; flex-direction: column; justify-content: center;' : ''}
         }
         .title {
-          font-size: 1.1em;
+          font-size: ${isHorizontal ? '1.0em' : '1.1em'};
           font-weight: 500;
           margin-bottom: 8px;
           color: var(--primary-text-color);
         }
         .artist {
-          font-size: 0.95em;
+          font-size: ${isHorizontal ? '0.9em' : '0.95em'};
           color: var(--secondary-text-color);
           margin-bottom: 4px;
         }
         .station {
-          font-size: 0.85em;
+          font-size: ${isHorizontal ? '0.8em' : '0.85em'};
           color: var(--disabled-text-color);
           margin-top: 8px;
         }
@@ -117,19 +146,22 @@ class NRKRadioCard extends HTMLElement {
         }
       </style>
       <ha-card>
-        ${this.config.show_header !== false ? `<div class="card-header">${this.config.name || 'Now Playing'}</div>` : ''}
+        ${this.config.show_header !== false && !isHorizontal ? `<div class="card-header">${this.config.name || 'Now Playing'}</div>` : ''}
 
-        ${displayImage ?
-          `<img class="artwork" src="${displayImage}" alt="Album artwork" />` :
-          `<div class="artwork-placeholder">
-            <ha-icon icon="mdi:${isNrk ? 'radio' : 'music'}"></ha-icon>
-          </div>`
-        }
+        <div class="artwork-container">
+          ${displayImage ?
+            `<img class="artwork" src="${displayImage}" alt="Artwork" />` :
+            `<div class="artwork-placeholder">
+              <ha-icon icon="mdi:${isNrk ? 'radio' : 'music'}"></ha-icon>
+            </div>`
+          }
+        </div>
 
         <div class="info">
+          ${this.config.show_header !== false && isHorizontal ? `<div class="card-header">${this.config.name || 'Now Playing'}</div>` : ''}
           <div class="title">${displayTitle}</div>
           ${displayArtist ? `<div class="artist">${displayArtist}</div>` : ''}
-          ${isNrk && programTitle ? `<div class="station">${stationName} – ${programTitle}</div>` : ''}
+          ${displayStation ? `<div class="station">${displayStation}</div>` : ''}
           ${isNrk ? '<div class="nrk-badge">NRK</div>' : ''}
         </div>
       </ha-card>
@@ -137,14 +169,16 @@ class NRKRadioCard extends HTMLElement {
   }
 
   getCardSize() {
-    return 4;
+    const layout = this.config.layout || 'square';
+    return layout === 'horizontal' ? 2 : 4;
   }
 
   static getStubConfig() {
     return {
       entity: 'sensor.example_nrk',
       name: 'Now Playing',
-      show_header: true
+      show_header: true,
+      layout: 'square'
     };
   }
 }

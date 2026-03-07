@@ -74,6 +74,7 @@ Once configured, the integration will:
 
 When playing NRK radio:
 - `station_name`: NRK station name
+- `station_logo`: NRK station logo URL
 - `program_title`: Current radio program
 - `track_title`: Current track name
 - `track_artist`: Track artist
@@ -95,11 +96,17 @@ This integration includes a custom Lovelace card for displaying NRK radio playba
 
 ### Card Features
 
-- Album artwork display with fallback icon
+- **Smart artwork display:**
+  - Shows album artwork when playing a track
+  - Shows station logo when playing program without specific track
+  - Fallback icon when no artwork available
 - Station name and program title
 - Track title and artist
 - Visual NRK badge when playing NRK radio
 - Automatic updates when track changes
+- **Two layout modes:**
+  - **Square** (default): Centered artwork with info below
+  - **Horizontal**: Compact panoramic view with artwork on left, perfect for narrow dashboard spaces
 - Responsive design for mobile and desktop
 
 ### Adding the Card
@@ -112,29 +119,53 @@ This integration includes a custom Lovelace card for displaying NRK radio playba
 
 ### Card Configuration
 
+#### Square Layout (Default)
 ```yaml
 type: custom:nrk-radio-card
 entity: sensor.bedroom_sonos_nrk
 name: Now Playing
 show_header: true
+layout: square
+```
+
+#### Horizontal/Panoramic Layout
+```yaml
+type: custom:nrk-radio-card
+entity: sensor.bedroom_sonos_nrk
+name: Now Playing
+show_header: true
+layout: horizontal
 ```
 
 **Configuration Options:**
 - `entity` (required): The NRK sensor entity ID
 - `name` (optional): Card header text (default: "Now Playing")
 - `show_header` (optional): Show/hide header (default: true)
+- `layout` (optional): Layout mode - `square` or `horizontal` (default: `square`)
 
-### Card Example
+### Card Examples
 
+**Square layout for main dashboard:**
 ```yaml
 type: custom:nrk-radio-card
 entity: sensor.living_room_sonos_nrk
 name: Living Room Radio
+layout: square
+```
+
+**Horizontal layout for compact spaces:**
+```yaml
+type: custom:nrk-radio-card
+entity: sensor.bedroom_sonos_nrk
+name: Bedroom
+layout: horizontal
+show_header: false
 ```
 
 The card will automatically display:
-- Album artwork when available
-- Track title and artist
+- **Album artwork** when playing a specific track
+- **Station logo** when playing a program without specific track info
+- Track title and artist (when available)
 - Station name and program title
 - A red NRK badge when playing NRK radio
 - Falls back to standard Sonos data when not playing NRK
