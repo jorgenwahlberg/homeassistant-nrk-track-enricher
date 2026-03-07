@@ -51,7 +51,7 @@ NRK_STATIONS: list[NRKStation] = [
         "stream_delay": 15000,
     },
     {
-        "name": "NRK P13",
+        "name": "NRK P3 Musikk",
         "api_url": "https://psapi.nrk.no/channels/p3musikk/liveelements",
         "livebuffer_url": "https://psapi.nrk.no/radio/channels/livebuffer/p3musikk",
         "sonos_uri": "x-sonosapi-hls:live%3ap3musikk",
