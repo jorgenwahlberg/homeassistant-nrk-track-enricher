@@ -428,15 +428,22 @@ class NRKRadioCardEditor extends HTMLElement {
   }
 }
 
-customElements.define('nrk-radio-card', NRKRadioCard);
-customElements.define('nrk-radio-card-editor', NRKRadioCardEditor);
+// Define custom elements only if not already defined
+if (!customElements.get('nrk-radio-card')) {
+  customElements.define('nrk-radio-card', NRKRadioCard);
+}
+if (!customElements.get('nrk-radio-card-editor')) {
+  customElements.define('nrk-radio-card-editor', NRKRadioCardEditor);
+}
 
-// Register the card with the card picker
+// Register the card with the card picker (only once)
 window.customCards = window.customCards || [];
-window.customCards.push({
-  type: 'nrk-radio-card',
-  name: 'NRK Radio Card',
-  description: 'Display NRK radio playback information with artwork',
-  preview: true,
-  documentationURL: 'https://github.com/jorgenwahlberg/homeassistant-nrk-track-enricher'
-});
+if (!window.customCards.find(card => card.type === 'nrk-radio-card')) {
+  window.customCards.push({
+    type: 'nrk-radio-card',
+    name: 'NRK Radio Card',
+    description: 'Display NRK radio playback information with artwork',
+    preview: true,
+    documentationURL: 'https://github.com/jorgenwahlberg/homeassistant-nrk-track-enricher'
+  });
+}

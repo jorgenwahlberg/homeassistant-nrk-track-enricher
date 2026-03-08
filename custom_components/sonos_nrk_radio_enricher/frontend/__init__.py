@@ -70,7 +70,10 @@ async def async_setup_frontend(hass: HomeAssistant) -> None:
     _LOGGER.debug("Registered card view at %s", view.url)
 
     # Register the card with the frontend
-    card_url = f"{view.url}?v={VERSION}"
+    # Use hash of content for cache busting to ensure updates are loaded
+    import hashlib
+    content_hash = hashlib.md5(js_content.encode()).hexdigest()[:8]
+    card_url = f"{view.url}?v={VERSION}-{content_hash}"
 
     _LOGGER.debug("Registering NRK Radio Card at %s", card_url)
 
