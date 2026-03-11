@@ -23,6 +23,13 @@ NRK_STATIONS: list[NRKStation] = [
         "stream_delay": 15000,
     },
     {
+        "name": "NRK P1 Stor-Oslo",
+        "api_url": "https://psapi.nrk.no/channels/p1_oslo_akershus/liveelements",
+        "livebuffer_url": "https://psapi.nrk.no/radio/channels/livebuffer/p1_oslo_akershus",
+        "sonos_uri": "x-sonosapi-hls:live%3ap1_oslo_akershus",
+        "stream_delay": 15000,
+    },
+    {
         "name": "NRK P2",
         "api_url": "https://psapi.nrk.no/channels/p2/liveelements",
         "livebuffer_url": "https://psapi.nrk.no/radio/channels/livebuffer/p2",
