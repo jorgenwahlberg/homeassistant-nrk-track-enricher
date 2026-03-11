@@ -78,6 +78,9 @@ async def async_setup_frontend(hass: HomeAssistant) -> None:
     _LOGGER.debug("Registering NRK Radio Card at %s", card_url)
 
     # Add the card to Lovelace
-    add_extra_js_url(hass, card_url)
-
-    _LOGGER.info("NRK Radio Card registered successfully at %s", card_url)
+    try:
+        add_extra_js_url(hass, card_url)
+        _LOGGER.info("NRK Radio Card registered successfully at %s", card_url)
+    except Exception as err:
+        _LOGGER.error("Failed to register NRK Radio Card: %s", err)
+        raise

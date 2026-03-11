@@ -14,6 +14,7 @@ from .frontend import async_setup_frontend
 _LOGGER = logging.getLogger(__name__)
 
 PLATFORMS = [Platform.SENSOR]
+FRONTEND_SETUP_KEY = f"{DOMAIN}_frontend_setup"
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -45,9 +46,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     _LOGGER.debug("Performing initial coordinator refresh")
     await coordinator.async_config_entry_first_refresh()
 
-    # Register the frontend card
-    _LOGGER.debug("Registering custom Lovelace card")
-    await async_setup_frontend(hass)
+    # Register the frontend card (only once globally)
+    if not hass.data.get(FRONTEND_SETUP_KEY):
+        _LOGGER.debug("Registering custom Lovelace card")
+        await async_setup_frontend(hass)
+        hass.data[FRONTEND_SETUP_KEY] = True
+    else:
+        _LOGGER.debug("Frontend already registered, skipping")
 
     # Set up platforms
     _LOGGER.debug("Setting up platforms: %s", PLATFORMS)
