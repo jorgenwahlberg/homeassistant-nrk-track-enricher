@@ -4,12 +4,12 @@ from __future__ import annotations
 import logging
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from homeassistant.const import EVENT_HOMEASSISTANT_STARTED, Platform
+from homeassistant.core import CoreState, HomeAssistant
 
 from .const import CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL, DOMAIN
 from .coordinator import NRKDataCoordinator
-from .frontend import async_setup_frontend
+from .frontend import async_register_lovelace_resource, async_setup_frontend
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -17,12 +17,22 @@ PLATFORMS = [Platform.SENSOR]
 
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
-    """Set up the integration at the integration level.
+    """Set up the integration.
 
-    Frontend resources must be registered here, before any config entries are
-    loaded, so the static path exists before HA starts serving HTTP requests.
+    Registers the static HTTP path immediately (needed before HTTP serving
+    starts), then defers Lovelace resource registration until after HA has
+    fully started (Lovelace storage is not loaded during async_setup).
     """
     await async_setup_frontend(hass)
+
+    async def _register_lovelace(_event=None) -> None:
+        await async_register_lovelace_resource(hass)
+
+    if hass.state == CoreState.running:
+        await _register_lovelace()
+    else:
+        hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STARTED, _register_lovelace)
+
     return True
 
 

@@ -2,7 +2,7 @@
 
 DOMAIN = "sonos_nrk_radio_enricher"
 NAME = "Sonos NRK Radio Enricher"
-VERSION = "1.0.3"
+VERSION = "1.0.4"
 
 # Frontend
 CARD_TYPE = "nrk-radio-card"
